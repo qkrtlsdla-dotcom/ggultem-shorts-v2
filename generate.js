@@ -36,10 +36,13 @@ export default async function handler(req, res) {
     });
     const data=await r.json();
     if(!r.ok) return res.status(r.status).json({error:data?.error?.message || "OpenAI API 오류"});
-    let text=data.output_text;
-    if(!text && Array.isArray(data.output)){
-      text=data.output.flatMap(x=>x.content||[]).filter(x=>x.type==="output_text").map(x=>x.text).join("\n");
-    }
+    let text = data.output_text || "";
+    if (!text && Array.isArray(data.output)) {
+    text = data.output
+      .flatMap(x => x.content || [])
+      .filter(x => x.type === "output_text" && x.text)
+    .map(x => x.text)  
+    .join("\n");
     return res.status(200).json({text:text||"응답 텍스트를 찾지 못했어요."});
   } catch(e){ return res.status(500).json({error:e.message}); }
 }
