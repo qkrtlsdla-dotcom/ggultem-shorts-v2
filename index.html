@@ -40,7 +40,7 @@ $("go").onclick=async()=>{
  $("go").disabled=true;$("status").textContent="AI가 쇼츠를 기획하는 중…";$("out").style.display="none";$("copy").style.display="none";
  try{
   const r=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-   referenceUrl:$("ref").value.trim(), killingPoint:$("kill").value.trim(), product, facts,
+   referenceUrl:$("ref").value.trim(), killingPoint:$("kill").value.trim(), productName: product, productInfo: facts,
    tone:$("tone").value, seconds:$("seconds").value
   })});
   const d=await r.json(); if(!r.ok) throw new Error(d.error||"생성 실패");
