@@ -44,7 +44,7 @@ $("go").onclick=async()=>{
    tone:$("tone").value, seconds:$("seconds").value
   })});
   const d=await r.json(); if(!r.ok) throw new Error(d.error||"생성 실패");
-  $("out").textContent=d.text || JSON.stringify(d,null,2);$("out").style.display="block";$("copy").style.display="block";$("status").textContent="완료!";
+  $("out").textContent=d.text||d.output_text||d.result||d.script||JSON.stringify(d,null,2);$("out").style.display="block";$("status").textContent="완료!";$("copy").style.display="block";
  }catch(e){$("status").innerHTML='<span class="err">'+e.message+"</span>"}
  finally{$("go").disabled=false}
 };
