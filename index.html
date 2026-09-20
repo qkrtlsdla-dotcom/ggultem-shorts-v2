@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>개꿀템추천 쇼츠공장 v2</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#0e0f13;color:#f5f5f5;font-family:system-ui,-apple-system,sans-serif}
+main{max-width:720px;margin:auto;padding:26px 18px 70px}h1{font-size:30px;margin:0 0 6px} .sub{color:#aaa;margin-bottom:28px}
+.card{background:#1a1c22;border:1px solid #343640;border-radius:22px;padding:20px;margin:16px 0}
+.step{color:#ffd34e;font-weight:800}h2{margin:8px 0 16px;font-size:23px}
+input,textarea,select{width:100%;background:#0f1015;color:#fff;border:1px solid #41434e;border-radius:15px;padding:15px;margin:7px 0;font-size:16px}
+textarea{min-height:90px;resize:vertical}button{width:100%;border:0;border-radius:15px;padding:16px;margin-top:10px;font-size:17px;font-weight:800;background:#ffd34e;color:#151515}
+button:disabled{opacity:.55}.out{white-space:pre-wrap;line-height:1.55;background:#101116;border-radius:14px;padding:16px;margin-top:14px;display:none}
+.note{font-size:13px;color:#999;margin-top:10px}.err{color:#ff8e8e}
+</style></head>
+<body><main>
+<h1>🛒 개꿀템추천 쇼츠공장 v2</h1>
+<div class="sub">상품 하나 → 실제 AI 쇼츠 기획 패키지</div>
+
+<div class="card"><div class="step">STEP 1</div><h2>🔗 참고영상</h2>
+<input id="ref" placeholder="YouTube 참고영상 URL (선택)">
+<textarea id="kill" placeholder="킬링포인트 메모 예: 첫 2초 문제상황 → 바로 해결"></textarea>
+<div class="note">참고영상 자체를 복제하지 않고 구조/아이디어 참고용으로만 사용합니다.</div></div>
+
+<div class="card"><div class="step">STEP 2</div><h2>🛍️ 상품 정보</h2>
+<input id="product" placeholder="상품명">
+<textarea id="facts" placeholder="확인된 특징/스펙만 입력"></textarea>
+<select id="tone"><option>빠른 꿀템형</option><option>문제해결형</option><option>비교형</option><option>홈쇼핑형</option></select>
+<select id="seconds"><option>20초</option><option selected>25초</option><option>30초</option></select>
+<button id="go">✨ AI 쇼츠 기획 만들기</button>
+<div id="status" class="note"></div>
+<div id="out" class="out"></div>
+<button id="copy" style="display:none;background:#2a2d35;color:white">전체 복사</button></div>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+$("go").onclick=async()=>{
+ const product=$("product").value.trim(), facts=$("facts").value.trim();
+ if(!product||!facts){alert("상품명과 확인된 특징을 입력해줘.");return}
+ $("go").disabled=true;$("status").textContent="AI가 쇼츠를 기획하는 중…";$("out").style.display="none";$("copy").style.display="none";
+ try{
+  const r=await fetch("/api/generate",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+   referenceUrl:$("ref").value.trim(), killingPoint:$("kill").value.trim(), product, facts,
+   tone:$("tone").value, seconds:$("seconds").value
+  })});
+  const d=await r.json(); if(!r.ok) throw new Error(d.error||"생성 실패");
+  $("out").textContent=d.text;$("out").style.display="block";$("copy").style.display="block";$("status").textContent="완료!";
+ }catch(e){$("status").innerHTML='<span class="err">'+e.message+"</span>"}
+ finally{$("go").disabled=false}
+};
+$("copy").onclick=async()=>{await navigator.clipboard.writeText($("out").textContent);$("copy").textContent="복사 완료 ✓";setTimeout(()=>$("copy").textContent="전체 복사",1200)}
+</script></body></html>
